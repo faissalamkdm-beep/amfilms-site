@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>amfilms · Back Office</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#F5F4F1;--white:#FFFFFF;--ink:#0F0F0F;--ink2:#444;--ink3:#888;
+  --v:#6B3FA0;--vh:#7C4DB5;--vp:#F2EDF9;--vb:rgba(107,63,160,.2);--vd:rgba(107,63,160,.12);
+  --g:#16A34A;--gp:#DCFCE7;--gd:rgba(22,163,74,.15);
+  --r:#DC2626;--rp:#FEE2E2;
+  --o:#D97706;--op:#FEF3C7;
+  --bdr:#E4E2DD;--bdr2:#D0CEC9;
+  --sh:0 1px 3px rgba(0,0,0,.06),0 4px 12px rgba(0,0,0,.07);
+  --sh2:0 8px 32px rgba(0,0,0,.1);
+  --f:'Bricolage Grotesque',sans-serif;
+  --sb:240px;--r2:12px;--r3:18px;
+}
+body{background:var(--bg);color:var(--ink);font-family:var(--f);font-size:14px;line-height:1.5;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{font-family:var(--f);cursor:pointer}
+input,textarea,select{font-family:var(--f)}
+
+/* ── LOGIN ── */
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000}
+.login-box{background:var(--white);border:1px solid var(--bdr);border-radius:var(--r3);padding:2.5rem;width:360px;box-shadow:var(--sh2)}
+.login-logo{font-size:1.4rem;font-weight:800;letter-spacing:-.03em;margin-bottom:.3rem}
+.login-logo span{color:var(--v)}
+.login-sub{font-size:.8rem;color:var(--ink3);margin-bottom:2rem}
+.login-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:.4rem;display:block}
+.login-input{width:100%;border:1.5px solid var(--bdr);border-radius:var(--r2);padding:.7rem .9rem;font-size:.88rem;background:var(--bg);color:var(--ink);transition:border-color .18s;margin-bottom:1rem;outline:none}
+.login-input:focus{border-color:var(--v);background:var(--white)}
+.login-btn{width:100%;background:var(--v);color:white;border:none;border-radius:var(--r2);padding:.85rem;font-size:.9rem;font-weight:700;transition:background .2s}
+.login-btn:hover{background:var(--vh)}
+.login-err{font-size:.78rem;color:var(--r);margin-top:.6rem;display:none}
+
+/* ── LAYOUT ── */
+#app{display:none;min-height:100vh}
+.sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:var(--sb);
+  background:var(--white);border-right:1px solid var(--bdr);
+  display:flex;flex-direction:column;z-index:100;
+}
+.sidebar-top{padding:1.5rem;border-bottom:1px solid var(--bdr)}
+.s-logo{font-size:1.15rem;font-weight:800;letter-spacing:-.03em}
+.s-logo span{color:var(--v)}
+.s-badge{font-size:.62rem;background:var(--vp);color:var(--v);border:1px solid var(--vb);border-radius:100px;padding:.15rem .55rem;font-weight:600;margin-top:.3rem;display:inline-block}
+.nav{flex:1;padding:1rem 0;overflow-y:auto}
+.nav-section{font-size:.6rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--ink3);padding:.5rem 1.2rem .3rem}
+.nav-item{
+  display:flex;align-items:center;gap:.75rem;
+  padding:.65rem 1.2rem;margin:0 .6rem .15rem;
+  border-radius:var(--r2);font-size:.84rem;font-weight:500;
+  color:var(--ink2);cursor:pointer;transition:all .18s;
+}
+.nav-item:hover{background:var(--bg);color:var(--ink)}
+.nav-item.active{background:var(--vp);color:var(--v);font-weight:600}
+.nav-item .ico{font-size:1rem;width:20px;text-align:center}
+.nav-item .badge{margin-left:auto;background:var(--v);color:white;border-radius:100px;padding:.1rem .5rem;font-size:.62rem;font-weight:700}
+.sidebar-foot{padding:1rem 1.2rem;border-top:1px solid var(--bdr)}
+.user-pill{display:flex;align-items:center;gap:.7rem}
+.user-av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--v),#9b6fd4);display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:.75rem;flex-shrink:0}
+.user-name{font-size:.82rem;font-weight:600}
+.user-role{font-size:.68rem;color:var(--ink3)}
+.logout-btn{margin-left:auto;background:none;border:1px solid var(--bdr);border-radius:8px;padding:.3rem .5rem;color:var(--ink3);font-size:.7rem;transition:all .18s}
+.logout-btn:hover{border-color:var(--r);color:var(--r)}
+
+/* ── MAIN ── */
+.main{margin-left:var(--sb);min-height:100vh;display:flex;flex-direction:column}
+.topbar{
+  position:sticky;top:0;z-index:50;
+  background:rgba(245,244,241,.92);backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--bdr);
+  padding:.9rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.topbar-title{font-size:1rem;font-weight:700}
+.topbar-right{display:flex;align-items:center;gap:.7rem}
+.content{padding:2rem;flex:1}
+
+/* ── CARDS ── */
+.card{background:var(--white);border:1px solid var(--bdr);border-radius:var(--r3);padding:1.5rem;box-shadow:var(--sh)}
+.card-title{font-size:.9rem;font-weight:700;margin-bottom:1.2rem;display:flex;align-items:center;gap:.5rem}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:.4rem;padding:.6rem 1.1rem;border-radius:var(--r2);font-size:.8rem;font-weight:600;border:none;cursor:pointer;transition:all .18s}
+.btn-v{background:var(--v);color:white}.btn-v:hover{background:var(--vh)}
+.btn-g{background:var(--g);color:white}.btn-g:hover{background:#15803d}
+.btn-r{background:var(--r);color:white}.btn-r:hover{background:#b91c1c}
+.btn-outline{background:transparent;border:1.5px solid var(--bdr2);color:var(--ink2)}.btn-outline:hover{border-color:var(--v);color:var(--v)}
+.btn-ghost{background:transparent;border:none;color:var(--ink3);padding:.4rem .6rem}.btn-ghost:hover{color:var(--ink)}
+.btn-sm{padding:.4rem .8rem;font-size:.74rem}
+
+/* ── STATUS BADGES ── */
+.status{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .7rem;border-radius:100px;font-size:.7rem;font-weight:600}
+.status-new{background:var(--vp);color:var(--v);border:1px solid var(--vb)}
+.status-read{background:var(--bg);color:var(--ink3);border:1px solid var(--bdr)}
+.status-done{background:var(--gp);color:var(--g);border:1px solid rgba(22,163,74,.25)}
+.status-pending{background:var(--op);color:var(--o);border:1px solid rgba(217,119,6,.25)}
+
+/* ── PAGES ── */
+.page{display:none}
+.page.active{display:block}
+
+/* ── DASHBOARD ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-bottom:1.5rem}
+.stat-card{background:var(--white);border:1px solid var(--bdr);border-radius:var(--r3);padding:1.2rem;box-shadow:var(--sh)}
+.stat-icon{font-size:1.4rem;margin-bottom:.6rem}
+.stat-n{font-size:1.8rem;font-weight:800;letter-spacing:-.03em}
+.stat-n.v{color:var(--v)}.stat-n.g{color:var(--g)}.stat-n.o{color:var(--o)}
+.stat-l{font-size:.72rem;color:var(--ink3);margin-top:.1rem}
+.stat-delta{font-size:.72rem;color:var(--g);font-weight:600;margin-top:.3rem}
+
+.recent-grid{display:grid;grid-template-columns:1.4fr 1fr;gap:1rem}
+
+/* ── LEADS TABLE ── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:.68rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);padding:.7rem 1rem;text-align:left;border-bottom:1px solid var(--bdr);white-space:nowrap}
+td{padding:.85rem 1rem;border-bottom:1px solid var(--bdr);font-size:.82rem;color:var(--ink2);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+.td-name{font-weight:600;color:var(--ink)}
+.td-actions{display:flex;gap:.3rem}
+
+/* Lead detail modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:500;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:var(--r3);width:560px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:var(--sh2)}
+.modal-head{padding:1.5rem;border-bottom:1px solid var(--bdr);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:1rem;font-weight:700}
+.modal-close{background:none;border:none;font-size:1.2rem;color:var(--ink3);cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:8px;transition:background .18s}
+.modal-close:hover{background:var(--bg)}
+.modal-body{padding:1.5rem}
+.modal-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:.8rem}
+.modal-field label{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:.3rem;display:block}
+.modal-field p{font-size:.85rem;color:var(--ink);line-height:1.5}
+.modal-msg{background:var(--bg);border-radius:var(--r2);padding:1rem;font-size:.84rem;color:var(--ink2);line-height:1.65;margin-top.8rem}
+.modal-foot{padding:1rem 1.5rem;border-top:1px solid var(--bdr);display:flex;gap:.6rem;justify-content:flex-end}
+
+/* ── FILTERS ── */
+.filters{display:flex;align-items:center;gap:.6rem;margin-bottom:1.2rem;flex-wrap:wrap}
+.filter-btn{padding:.4rem .9rem;border-radius:100px;font-size:.75rem;font-weight:600;border:1.5px solid var(--bdr);background:var(--white);color:var(--ink3);cursor:pointer;transition:all .18s}
+.filter-btn.active{border-color:var(--v);background:var(--vp);color:var(--v)}
+.search-input{padding:.5rem .9rem;border:1.5px solid var(--bdr);border-radius:var(--r2);font-size:.82rem;background:var(--white);color:var(--ink);width:220px;outline:none;transition:border-color .18s}
+.search-input:focus{border-color:var(--v)}
+
+/* ── CONTENT EDITOR ── */
+.editor-grid{display:grid;grid-template-columns:220px 1fr;gap:1.2rem}
+.editor-nav{display:flex;flex-direction:column;gap:.3rem}
+.editor-nav-item{padding:.65rem .9rem;border-radius:var(--r2);font-size:.82rem;font-weight:500;color:var(--ink2);cursor:pointer;transition:all .18s;border:1px solid transparent}
+.editor-nav-item:hover{background:var(--bg)}
+.editor-nav-item.active{background:var(--vp);color:var(--v);border-color:var(--vb);font-weight:600}
+.editor-panel{display:none}
+.editor-panel.active{display:block}
+.field-group{margin-bottom:1.2rem}
+.field-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:.4rem;display:block}
+.field-input{width:100%;border:1.5px solid var(--bdr);border-radius:var(--r2);padding:.65rem .85rem;font-size:.85rem;color:var(--ink);background:var(--white);transition:border-color .18s;outline:none}
+.field-input:focus{border-color:var(--v)}
+.field-textarea{width:100%;border:1.5px solid var(--bdr);border-radius:var(--r2);padding:.65rem .85rem;font-size:.85rem;color:var(--ink);background:var(--white);resize:vertical;min-height:90px;transition:border-color .18s;outline:none;line-height:1.6}
+.field-textarea:focus{border-color:var(--v)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.save-bar{background:var(--ink);color:white;border-radius:var(--r2);padding:.9rem 1.2rem;display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+.save-bar p{font-size:.82rem;opacity:.8}
+.saved-toast{position:fixed;bottom:2rem;right:2rem;background:var(--g);color:white;border-radius:var(--r2);padding:.8rem 1.4rem;font-size:.82rem;font-weight:600;box-shadow:var(--sh2);z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none}
+.saved-toast.show{opacity:1;transform:translateY(0)}
+
+/* ── PORTFOLIO ── */
+.porto-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+.porto-card{background:var(--white);border:1px solid var(--bdr);border-radius:var(--r3);overflow:hidden;box-shadow:var(--sh);transition:box-shadow .2s}
+.porto-card:hover{box-shadow:var(--sh2)}
+.porto-thumb{aspect-ratio:16/9;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:2rem}
+.pt1{background:linear-gradient(145deg,#F2EDF9,#DDD0F4)}
+.pt2{background:linear-gradient(145deg,#EBF5FF,#C7DEFF)}
+.pt3{background:linear-gradient(145deg,#F0FDF4,#BBF7D0)}
+.pt4{background:linear-gradient(145deg,#FFF7ED,#FED7AA)}
+.pt5{background:linear-gradient(145deg,#FFF1F2,#FECDD3)}
+.pt-add{background:var(--bg);border:2px dashed var(--bdr2);cursor:pointer;transition:all .2s}
+.pt-add:hover{border-color:var(--v);background:var(--vp)}
+.pt-add .add-icon{font-size:1.8rem;color:var(--ink3)}
+.pt-add:hover .add-icon{color:var(--v)}
+.porto-body{padding:1rem}
+.porto-tag{font-size:.63rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:.3rem}
+.porto-title{font-size:.9rem;font-weight:700;margin-bottom:.4rem}
+.porto-metrics{display:flex;gap:.6rem;margin-bottom:.8rem;flex-wrap:wrap}
+.pm{font-size:.72rem;background:var(--vp);color:var(--v);border-radius:100px;padding:.18rem .6rem;font-weight:600}
+.porto-actions{display:flex;gap:.4rem}
+
+/* ── STATS ── */
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:1rem;margin-bottom:1rem}
+.chart-card{background:var(--white);border:1px solid var(--bdr);border-radius:var(--r3);padding:1.4rem;box-shadow:var(--sh)}
+.chart-title{font-size:.85rem;font-weight:700;margin-bottom:1.2rem}
+.bar-chart{display:flex;align-items:flex-end;gap:.5rem;height:120px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:.4rem}
+.bar{width:100%;border-radius:6px 6px 0 0;background:var(--v);opacity:.8;transition:opacity .2s}
+.bar:hover{opacity:1}
+.bar-label{font-size:.6rem;color:var(--ink3)}
+.bar-val{font-size:.65rem;font-weight:700;color:var(--v)}
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem}
+.kpi{background:var(--white);border:1px solid var(--bdr);border-radius:var(--r3);padding:1.2rem;box-shadow:var(--sh);text-align:center}
+.kpi-n{font-size:2rem;font-weight:800;letter-spacing:-.04em;color:var(--v)}
+.kpi-l{font-size:.72rem;color:var(--ink3);margin-top:.2rem}
+.kpi-d{font-size:.72rem;color:var(--g);font-weight:600;margin-top:.3rem}
+.source-list{display:flex;flex-direction:column;gap:.6rem}
+.source-item{display:flex;align-items:center;gap:.8rem}
+.source-name{font-size:.8rem;font-weight:500;width:100px;flex-shrink:0}
+.source-bar-wrap{flex:1;height:8px;background:var(--bg3,#ECEAE5);border-radius:100px;overflow:hidden}
+.source-bar-fill{height:100%;background:var(--v);border-radius:100px}
+.source-pct{font-size:.75rem;font-weight:700;color:var(--v);width:36px;text-align:right;flex-shrink:0}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--g);color:white;border-radius:var(--r2);padding:.8rem 1.4rem;font-size:.82rem;font-weight:600;box-shadow:var(--sh2);z-index:999;opacity:0;transform:translateY(10px);transition:all .3s;pointer-events:none;display:flex;align-items:center;gap:.5rem}
+.toast.show{opacity:1;transform:translateY(0)}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:3rem 1rem;color:var(--ink3)}
+.empty-ico{font-size:2.5rem;margin-bottom:.8rem}
+.empty-title{font-size:.9rem;font-weight:600;color:var(--ink2);margin-bottom:.3rem}
+.empty-sub{font-size:.78rem;line-height:1.6}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">am<span>films</span></div>
+    <p class="login-sub">Accès back office · Espace privé</p>
+    <label class="login-label">Identifiant</label>
+    <input type="text" class="login-input" id="l-user" placeholder="admin" autocomplete="username">
+    <label class="login-label">Mot de passe</label>
+    <input type="password" class="login-input" id="l-pass" placeholder="••••••••" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">Se connecter →</button>
+    <p class="login-err" id="l-err">Identifiant ou mot de passe incorrect.</p>
+    <p style="font-size:.7rem;color:var(--ink3);margin-top:1rem;text-align:center">Login : <strong>admin</strong> · MDP : <strong>amfilms2026</strong></p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="s-logo">am<span>films</span></div>
+      <div class="s-badge">Back Office v1.0</div>
+    </div>
+    <nav class="nav">
+      <div class="nav-section">Principal</div>
+      <div class="nav-item active" onclick="goTo('dashboard')"><span class="ico">📊</span> Tableau de bord</div>
+      <div class="nav-item" onclick="goTo('leads')"><span class="ico">📥</span> Demandes <span class="badge" id="leads-badge">0</span></div>
+      <div class="nav-section" style="margin-top:.5rem">Contenu</div>
+      <div class="nav-item" onclick="goTo('content')"><span class="ico">✏️</span> Textes du site</div>
+      <div class="nav-item" onclick="goTo('portfolio')"><span class="ico">🎬</span> Portfolio</div>
+      <div class="nav-section" style="margin-top:.5rem">Analyse</div>
+      <div class="nav-item" onclick="goTo('stats')"><span class="ico">📈</span> Statistiques</div>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="user-pill">
+        <div class="user-av">FA</div>
+        <div>
+          <div class="user-name">Faissal</div>
+          <div class="user-role">Administrateur</div>
+        </div>
+        <button class="logout-btn" onclick="doLogout()">↩</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="page-title">Tableau de bord</div>
+      <div class="topbar-right">
+        <span style="font-size:.75rem;color:var(--ink3)" id="current-date"></span>
+        <a href="/" target="_blank" class="btn btn-outline btn-sm">↗ Voir le site</a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon">📥</div>
+            <div class="stat-n v" id="dash-leads">0</div>
+            <div class="stat-l">Demandes reçues</div>
+            <div class="stat-delta" id="dash-new-leads">0 nouvelles</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">👁️</div>
+            <div class="stat-n" style="color:var(--ink)">1 247</div>
+            <div class="stat-l">Visites ce mois</div>
+            <div class="stat-delta">+18% vs mois dernier</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🎬</div>
+            <div class="stat-n v" id="dash-projects">0</div>
+            <div class="stat-l">Projets en portfolio</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">💜</div>
+            <div class="stat-n" style="color:var(--ink)">4.2%</div>
+            <div class="stat-l">Taux de conversion</div>
+            <div class="stat-delta">+0.8pt ce mois</div>
+          </div>
+        </div>
+
+        <div class="recent-grid">
+          <div class="card">
+            <div class="card-title">📥 Dernières demandes</div>
+            <div id="dash-recent-leads">
+              <div class="empty"><div class="empty-ico">📭</div><div class="empty-title">Aucune demande pour l'instant</div><div class="empty-sub">Les demandes du formulaire apparaîtront ici</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title">⚡ Actions rapides</div>
+            <div style="display:flex;flex-direction:column;gap:.6rem">
+              <button class="btn btn-v" style="width:100%;justify-content:center" onclick="goTo('leads')">📥 Voir toutes les demandes</button>
+              <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="goTo('portfolio')">🎬 Ajouter une réalisation</button>
+              <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="goTo('content')">✏️ Modifier les textes</button>
+              <button class="btn btn-outline" style="width:100%;justify-content:center" onclick="addDemoLead()">🧪 Simuler une demande</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LEADS -->
+      <div class="page" id="page-leads">
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem">
+            <div class="card-title" style="margin:0">📥 Demandes clients</div>
+            <div style="display:flex;gap:.5rem">
+              <button class="btn btn-outline btn-sm" onclick="exportLeads()">⬇ Exporter CSV</button>
+              <button class="btn btn-v btn-sm" onclick="addDemoLead()">+ Simuler lead</button>
+            </div>
+          </div>
+          <div class="filters">
+            <input class="search-input" type="text" placeholder="🔍 Rechercher..." oninput="filterLeads(this.value)">
+            <button class="filter-btn active" onclick="filterByStatus('all',this)">Tous</button>
+            <button class="filter-btn" onclick="filterByStatus('new',this)">Nouveaux</button>
+            <button class="filter-btn" onclick="filterByStatus('read',this)">Lus</button>
+            <button class="filter-btn" onclick="filterByStatus('done',this)">Traités</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nom</th><th>Email</th><th>Service</th><th>Budget</th><th>Date</th><th>Statut</th><th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="leads-tbody">
+                <tr><td colspan="7"><div class="empty"><div class="empty-ico">📭</div><div class="empty-title">Aucune demande</div><div class="empty-sub">Cliquez sur "Simuler lead" pour tester</div></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENT EDITOR -->
+      <div class="page" id="page-content">
+        <div class="save-bar">
+          <p>💡 Modifiez vos textes ici — copiez-les ensuite dans votre fichier HTML</p>
+          <button class="btn btn-g btn-sm" onclick="saveContent()">💾 Sauvegarder</button>
+        </div>
+        <div class="editor-grid">
+          <div class="editor-nav">
+            <div class="editor-nav-item active" onclick="switchSection('hero',this)">🏠 Hero</div>
+            <div class="editor-nav-item" onclick="switchSection('services',this)">🎯 Services</div>
+            <div class="editor-nav-item" onclick="switchSection('stats',this)">📊 Chiffres clés</div>
+            <div class="editor-nav-item" onclick="switchSection('cta',this)">📣 CTA</div>
+            <div class="editor-nav-item" onclick="switchSection('contact',this)">📞 Contact</div>
+          </div>
+
+          <div>
+            <!-- HERO -->
+            <div class="editor-panel card active" id="section-hero">
+              <div class="card-title">🏠 Section Hero</div>
+              <div class="field-group">
+                <label class="field-label">Titre principal (ligne 1)</label>
+                <input class="field-input" id="hero-l1" value="La vidéo qui fait">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Titre principal (ligne 2 — en violet)</label>
+                <input class="field-input" id="hero-l2" value="vraiment grandir">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Titre principal (ligne 3)</label>
+                <input class="field-input" id="hero-l3" value="votre PME.">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Sous-titre</label>
+                <textarea class="field-textarea" id="hero-sub">Vous avez une expertise solide. On lui donne une image à la hauteur — pour attirer plus de clients et vous démarquer.</textarea>
+              </div>
+              <div class="field-row">
+                <div class="field-group">
+                  <label class="field-label">Bouton principal</label>
+                  <input class="field-input" id="hero-btn1" value="Je veux plus de clients →">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Bouton secondaire</label>
+                  <input class="field-input" id="hero-btn2" value="Voir les résultats">
+                </div>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Badge live</label>
+                <input class="field-input" id="hero-badge" value="Production vidéo · Bruxelles · 7j/7">
+              </div>
+            </div>
+
+            <!-- SERVICES -->
+            <div class="editor-panel card" id="section-services">
+              <div class="card-title">🎯 Services</div>
+              <div id="services-list"></div>
+            </div>
+
+            <!-- STATS -->
+            <div class="editor-panel card" id="section-stats">
+              <div class="card-title">📊 Chiffres clés (Hero)</div>
+              <div class="field-row">
+                <div class="field-group"><label class="field-label">Stat 1 — Chiffre</label><input class="field-input" id="stat1n" value="150+"></div>
+                <div class="field-group"><label class="field-label">Stat 1 — Label</label><input class="field-input" id="stat1l" value="entreprises accompagnées"></div>
+              </div>
+              <div class="field-row">
+                <div class="field-group"><label class="field-label">Stat 2 — Chiffre</label><input class="field-input" id="stat2n" value="98%"></div>
+                <div class="field-group"><label class="field-label">Stat 2 — Label</label><input class="field-input" id="stat2l" value="clients satisfaits"></div>
+              </div>
+              <div class="field-row">
+                <div class="field-group"><label class="field-label">Stat 3 — Chiffre</label><input class="field-input" id="stat3n" value="8+"></div>
+                <div class="field-group"><label class="field-label">Stat 3 — Label</label><input class="field-input" id="stat3l" value="ans d'expérience"></div>
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="editor-panel card" id="section-cta">
+              <div class="card-title">📣 Section CTA final</div>
+              <div class="field-group"><label class="field-label">Titre CTA</label><input class="field-input" id="cta-title" value="Prêt à faire de votre image votre meilleur atout ?"></div>
+              <div class="field-group"><label class="field-label">Sous-titre CTA</label><textarea class="field-textarea" id="cta-sub">Rejoignez les 150+ entrepreneurs belges qui ont transformé leur présence visuelle avec amfilms.</textarea></div>
+              <div class="field-row">
+                <div class="field-group"><label class="field-label">Bouton 1</label><input class="field-input" id="cta-btn1" value="+32 2 550 38 98"></div>
+                <div class="field-group"><label class="field-label">Bouton 2</label><input class="field-input" id="cta-btn2" value="Devis gratuit →"></div>
+              </div>
+            </div>
+
+            <!-- CONTACT -->
+            <div class="editor-panel card" id="section-contact">
+              <div class="card-title">📞 Informations de contact</div>
+              <div class="field-row">
+                <div class="field-group"><label class="field-label">Téléphone 1</label><input class="field-input" id="tel1" value="+32 2 550 38 98"></div>
+                <div class="field-group"><label class="field-label">Téléphone 2</label><input class="field-input" id="tel2" value="+32 486 06 48 82"></div>
+              </div>
+              <div class="field-row">
+                <div class="field-group"><label class="field-label">Email</label><input class="field-input" id="email" value="contact@amfilms.be"></div>
+                <div class="field-group"><label class="field-label">Localisation</label><input class="field-input" id="location" value="Bruxelles, Belgique"></div>
+              </div>
+              <div class="field-row">
+                <div class="field-group"><label class="field-label">Instagram</label><input class="field-input" id="insta" value="https://www.instagram.com/amfilmsbe"></div>
+                <div class="field-group"><label class="field-label">WhatsApp</label><input class="field-input" id="wa" value="https://wa.me/32486064882"></div>
+              </div>
+              <div class="field-group"><label class="field-label">Horaires</label><input class="field-input" id="hours" value="7j/7 · 08h–22h"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PORTFOLIO -->
+      <div class="page" id="page-portfolio">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem">
+          <div></div>
+          <button class="btn btn-v" onclick="openAddProject()">+ Ajouter une réalisation</button>
+        </div>
+        <div class="porto-grid" id="porto-grid"></div>
+      </div>
+
+      <!-- STATS -->
+      <div class="page" id="page-stats">
+        <div class="kpi-grid">
+          <div class="kpi"><div class="kpi-n">1 247</div><div class="kpi-l">Visites ce mois</div><div class="kpi-d">↑ +18%</div></div>
+          <div class="kpi"><div class="kpi-n">4.2%</div><div class="kpi-l">Taux conversion</div><div class="kpi-d">↑ +0.8pt</div></div>
+          <div class="kpi"><div class="kpi-n">3:24</div><div class="kpi-l">Temps moyen</div><div class="kpi-d">↑ +42s</div></div>
+        </div>
+        <div class="stats-row">
+          <div class="chart-card">
+            <div class="chart-title">Visites par semaine</div>
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-val">198</div><div class="bar" style="height:55%"></div><div class="bar-label">S1</div></div>
+              <div class="bar-col"><div class="bar-val">245</div><div class="bar" style="height:68%"></div><div class="bar-label">S2</div></div>
+              <div class="bar-col"><div class="bar-val">312</div><div class="bar" style="height:87%"></div><div class="bar-label">S3</div></div>
+              <div class="bar-col"><div class="bar-val">289</div><div class="bar" style="height:80%"></div><div class="bar-label">S4</div></div>
+              <div class="bar-col"><div class="bar-val">356</div><div class="bar" style="height:99%"></div><div class="bar-label">S5</div></div>
+              <div class="bar-col"><div class="bar-val">203</div><div class="bar" style="height:56%"></div><div class="bar-label">S6</div></div>
+            </div>
+          </div>
+          <div class="chart-card">
+            <div class="chart-title">Demandes par semaine</div>
+            <div class="bar-chart">
+              <div class="bar-col"><div class="bar-val">2</div><div class="bar" style="height:25%;background:#16A34A"></div><div class="bar-label">S1</div></div>
+              <div class="bar-col"><div class="bar-val">4</div><div class="bar" style="height:50%;background:#16A34A"></div><div class="bar-label">S2</div></div>
+              <div class="bar-col"><div class="bar-val">3</div><div class="bar" style="height:37%;background:#16A34A"></div><div class="bar-label">S3</div></div>
+              <div class="bar-col"><div class="bar-val">7</div><div class="bar" style="height:87%;background:#16A34A"></div><div class="bar-label">S4</div></div>
+              <div class="bar-col"><div class="bar-val">8</div><div class="bar" style="height:100%;background:#16A34A"></div><div class="bar-label">S5</div></div>
+              <div class="bar-col"><div class="bar-val">5</div><div class="bar" style="height:62%;background:#16A34A"></div><div class="bar-label">S6</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title" style="margin-bottom:1rem">Sources de trafic</div>
+          <div class="source-list">
+            <div class="source-item"><div class="source-name">Google</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:42%"></div></div><div class="source-pct">42%</div></div>
+            <div class="source-item"><div class="source-name">LinkedIn</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:28%"></div></div><div class="source-pct">28%</div></div>
+            <div class="source-item"><div class="source-name">Instagram</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:16%"></div></div><div class="source-pct">16%</div></div>
+            <div class="source-item"><div class="source-name">Direct</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:10%"></div></div><div class="source-pct">10%</div></div>
+            <div class="source-item"><div class="source-name">Autre</div><div class="source-bar-wrap"><div class="source-bar-fill" style="width:4%"></div></div><div class="source-pct">4%</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </main>
+</div><!-- /app -->
+
+<!-- LEAD MODAL -->
+<div class="modal-overlay" id="lead-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title" id="modal-lead-name">Détail de la demande</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-row">
+        <div class="modal-field"><label>Nom complet</label><p id="m-name">—</p></div>
+        <div class="modal-field"><label>Email</label><p id="m-email">—</p></div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field"><label>Service demandé</label><p id="m-service">—</p></div>
+        <div class="modal-field"><label>Budget</label><p id="m-budget">—</p></div>
+      </div>
+      <div class="modal-row">
+        <div class="modal-field"><label>Date de réception</label><p id="m-date">—</p></div>
+        <div class="modal-field"><label>Statut</label><p id="m-status">—</p></div>
+      </div>
+      <div style="margin-top:1rem">
+        <div class="modal-field"><label>Message</label></div>
+        <div class="modal-msg" id="m-msg">—</div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline btn-sm" onclick="updateLeadStatus('read')">Marquer comme lu</button>
+      <button class="btn btn-g btn-sm" onclick="updateLeadStatus('done')">✓ Traité</button>
+      <a href="#" id="m-reply" class="btn btn-v btn-sm">✉ Répondre</a>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PROJECT MODAL -->
+<div class="modal-overlay" id="project-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Ajouter une réalisation</div>
+      <button class="modal-close" onclick="closeProjectModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">Titre du projet</label><input class="field-input" id="p-title" placeholder="Ex: Film corporate · Client X"></div>
+        <div class="field-group"><label class="field-label">Secteur</label><input class="field-input" id="p-sector" placeholder="Ex: Immobilier · Bruxelles"></div>
+      </div>
+      <div class="field-row">
+        <div class="field-group"><label class="field-label">Métrique 1</label><input class="field-input" id="p-m1" placeholder="Ex: +280% leads"></div>
+        <div class="field-group"><label class="field-label">Métrique 2</label><input class="field-input" id="p-m2" placeholder="Ex: ×4 vues LinkedIn"></div>
+      </div>
+      <div class="field-group"><label class="field-label">Description courte</label><textarea class="field-textarea" id="p-desc" placeholder="Décrivez brièvement le projet et les résultats obtenus..." style="min-height:70px"></textarea></div>
+      <div class="field-group">
+        <label class="field-label">Couleur de la vignette</label>
+        <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+          <div onclick="selectThumb(this,'pt1')" style="width:36px;height:36px;border-radius:8px;background:linear-gradient(145deg,#F2EDF9,#DDD0F4);cursor:pointer;border:2px solid var(--v)"></div>
+          <div onclick="selectThumb(this,'pt2')" style="width:36px;height:36px;border-radius:8px;background:linear-gradient(145deg,#EBF5FF,#C7DEFF);cursor:pointer;border:2px solid transparent"></div>
+          <div onclick="selectThumb(this,'pt3')" style="width:36px;height:36px;border-radius:8px;background:linear-gradient(145deg,#F0FDF4,#BBF7D0);cursor:pointer;border:2px solid transparent"></div>
+          <div onclick="selectThumb(this,'pt4')" style="width:36px;height:36px;border-radius:8px;background:linear-gradient(145deg,#FFF7ED,#FED7AA);cursor:pointer;border:2px solid transparent"></div>
+          <div onclick="selectThumb(this,'pt5')" style="width:36px;height:36px;border-radius:8px;background:linear-gradient(145deg,#FFF1F2,#FECDD3);cursor:pointer;border:2px solid transparent"></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeProjectModal()">Annuler</button>
+      <button class="btn btn-v" onclick="saveProject()">💾 Ajouter au portfolio</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">✓ <span id="toast-msg">Sauvegardé</span></div>
+
+<script>
+// ── DATA
+let leads = JSON.parse(localStorage.getItem('af_leads') || '[]');
+let projects = JSON.parse(localStorage.getItem('af_projects') || '[]');
+let content = JSON.parse(localStorage.getItem('af_content') || '{}');
+let currentLead = null;
+let currentFilter = 'all';
+let searchQ = '';
+let selectedThumb = 'pt1';
+
+// ── LOGIN
+function doLogin(){
+  const u=document.getElementById('l-user').value;
+  const p=document.getElementById('l-pass').value;
+  if(u==='admin' && p==='amfilms2026'){
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    init();
+  } else {
+    document.getElementById('l-err').style.display='block';
+  }
+}
+document.addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+function doLogout(){
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('l-pass').value='';
+}
+
+// ── INIT
+function init(){
+  document.getElementById('current-date').textContent=new Date().toLocaleDateString('fr-BE',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  updateDashboard();
+  renderLeads();
+  renderPortfolio();
+  loadContent();
+  renderServices();
+}
+
+// ── NAVIGATE
+function goTo(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const titles={dashboard:'Tableau de bord',leads:'Demandes clients',content:'Textes du site',portfolio:'Portfolio',stats:'Statistiques'};
+  document.getElementById('page-title').textContent=titles[page]||page;
+  // find clicked nav item
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.textContent.trim().toLowerCase().includes(page.substring(0,4))||
+       (page==='dashboard'&&n.textContent.includes('Tableau'))||
+       (page==='leads'&&n.textContent.includes('Demandes'))||
+       (page==='content'&&n.textContent.includes('Textes'))||
+       (page==='portfolio'&&n.textContent.includes('Portfolio'))||
+       (page==='stats'&&n.textContent.includes('Stat')))
+      n.classList.add('active');
+  });
+}
+
+// ── DASHBOARD
+function updateDashboard(){
+  const newLeads=leads.filter(l=>l.status==='new').length;
+  document.getElementById('dash-leads').textContent=leads.length;
+  document.getElementById('dash-new-leads').textContent=newLeads+' nouvelle'+(newLeads>1?'s':'');
+  document.getElementById('dash-projects').textContent=projects.length;
+  document.getElementById('leads-badge').textContent=newLeads;
+  document.getElementById('leads-badge').style.display=newLeads>0?'inline':'none';
+  // recent
+  const box=document.getElementById('dash-recent-leads');
+  if(leads.length===0){
+    box.innerHTML='<div class="empty"><div class="empty-ico">📭</div><div class="empty-title">Aucune demande</div><div class="empty-sub">Cliquez "Simuler lead" pour tester</div></div>';
+    return;
+  }
+  const recent=leads.slice(-3).reverse();
+  box.innerHTML=recent.map(l=>`
+    <div onclick="openLead('${l.id}')" style="display:flex;align-items:center;gap:.8rem;padding:.7rem 0;border-bottom:1px solid var(--bdr);cursor:pointer">
+      <div style="width:34px;height:34px;border-radius:50%;background:var(--vp);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.75rem;color:var(--v);flex-shrink:0">${l.name.slice(0,2).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:.82rem;font-weight:600">${l.name}</div>
+        <div style="font-size:.72rem;color:var(--ink3)">${l.service}</div>
+      </div>
+      <span class="status status-${l.status}">${statusLabel(l.status)}</span>
+    </div>
+  `).join('');
+}
+
+// ── LEADS
+const SERVICES=['Film Institutionnel','Vidéo Publicitaire','Social Media','Témoignage Client','Photographie Pro','Motion Design','Autre'];
+const BUDGETS=['Moins de 1 000€','1 000€ – 3 000€','3 000€ – 7 000€','7 000€ – 15 000€','15 000€ +'];
+const MSGS=[
+  'Bonjour, nous cherchons à produire un film corporate pour notre site web. Pouvez-vous nous contacter pour discuter de nos besoins ?',
+  'Suite à votre profil LinkedIn, je suis intéressé par vos services pour une campagne Meta. Notre budget est flexible si le résultat est au rendez-vous.',
+  'Nous avons besoin de contenu mensuel pour nos réseaux sociaux. 8 à 12 Reels par mois environ. Pouvez-vous nous faire une proposition ?',
+  'Je suis coach et je lance une formation. J\'aimerais 3-4 vidéos publicitaires pour Meta Ads. Quels sont vos délais ?',
+  'Notre cabinet recherche un partenaire pour valoriser nos expertises sur LinkedIn. Vidéo institutionnelle + contenu régulier.',
+];
+const NAMES=['Sophie Laurent','Marc Dubois','Amina Chaoui','Jean-Pierre Noel','Thomas Klein','Sarah Maes','Alex Fontaine'];
+const EMAILS=['sophie@cabinet-sl.be','marc.dubois@nova.be','a.chaoui@wellness.be','jp.noel@conseil.be','t.klein@immopro.be'];
+
+function addDemoLead(){
+  const n=NAMES[Math.floor(Math.random()*NAMES.length)];
+  const lead={
+    id:'l'+Date.now(),
+    name:n,
+    email:EMAILS[Math.floor(Math.random()*EMAILS.length)],
+    service:SERVICES[Math.floor(Math.random()*6)],
+    budget:BUDGETS[Math.floor(Math.random()*BUDGETS.length)],
+    msg:MSGS[Math.floor(Math.random()*MSGS.length)],
+    date:new Date().toLocaleDateString('fr-BE'),
+    time:new Date().toLocaleTimeString('fr-BE',{hour:'2-digit',minute:'2-digit'}),
+    status:'new'
+  };
+  leads.push(lead);
+  savLeads();
+  renderLeads();
+  updateDashboard();
+  showToast('Nouvelle demande reçue de '+lead.name+' !');
+}
+
+function savLeads(){localStorage.setItem('af_leads',JSON.stringify(leads))}
+
+function renderLeads(){
+  let filtered=leads.filter(l=>{
+    const matchStatus=currentFilter==='all'||l.status===currentFilter;
+    const matchSearch=!searchQ||(l.name+l.email+l.service).toLowerCase().includes(searchQ.toLowerCase());
+    return matchStatus&&matchSearch;
+  }).reverse();
+  const tbody=document.getElementById('leads-tbody');
+  if(filtered.length===0){
+    tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-ico">📭</div><div class="empty-title">Aucune demande</div><div class="empty-sub">Cliquez "Simuler lead" pour tester</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML=filtered.map(l=>`
+    <tr>
+      <td class="td-name">${l.name}</td>
+      <td><a href="mailto:${l.email}" style="color:var(--v)">${l.email}</a></td>
+      <td>${l.service}</td>
+      <td>${l.budget}</td>
+      <td>${l.date} ${l.time}</td>
+      <td><span class="status status-${l.status}">${statusLabel(l.status)}</span></td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-v btn-sm" onclick="openLead('${l.id}')">Voir</button>
+          <button class="btn btn-outline btn-sm" onclick="deleteLead('${l.id}')">✕</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function statusLabel(s){return{new:'🔵 Nouveau',read:'👁 Lu',done:'✅ Traité'}[s]||s}
+
+function filterByStatus(status,btn){
+  currentFilter=status;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLeads();
+}
+function filterLeads(q){searchQ=q;renderLeads()}
+
+function openLead(id){
+  const l=leads.find(x=>x.id===id);
+  if(!l)return;
+  currentLead=l;
+  document.getElementById('m-name').textContent=l.name;
+  document.getElementById('m-email').textContent=l.email;
+  document.getElementById('m-service').textContent=l.service;
+  document.getElementById('m-budget').textContent=l.budget;
+  document.getElementById('m-date').textContent=l.date+' à '+l.time;
+  document.getElementById('m-status').innerHTML='<span class="status status-'+l.status+'">'+statusLabel(l.status)+'</span>';
+  document.getElementById('m-msg').textContent=l.msg;
+  document.getElementById('m-reply').href='mailto:'+l.email+'?subject=Suite à votre demande - amfilms';
+  document.getElementById('modal-lead-name').textContent=l.name;
+  document.getElementById('lead-modal').classList.add('open');
+  if(l.status==='new'){l.status='read';savLeads();updateDashboard();renderLeads();}
+}
+function closeModal(){document.getElementById('lead-modal').classList.remove('open')}
+function updateLeadStatus(s){
+  if(!currentLead)return;
+  currentLead.status=s;
+  savLeads();renderLeads();updateDashboard();
+  document.getElementById('m-status').innerHTML='<span class="status status-'+s+'">'+statusLabel(s)+'</span>';
+  showToast(s==='done'?'Demande marquée comme traitée':'Statut mis à jour');
+}
+function deleteLead(id){
+  if(!confirm('Supprimer cette demande ?'))return;
+  leads=leads.filter(l=>l.id!==id);
+  savLeads();renderLeads();updateDashboard();
+  showToast('Demande supprimée');
+}
+function exportLeads(){
+  const rows=[['Nom','Email','Service','Budget','Date','Statut','Message'],...leads.map(l=>[l.name,l.email,l.service,l.budget,l.date+' '+l.time,l.status,l.msg])];
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='amfilms-leads-'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+}
+
+// ── CONTENT
+const defaultServices=[
+  {ico:'🏢',name:'Film Institutionnel',desc:'Présentez votre entreprise et votre équipe avec une vidéo qui inspire confiance immédiatement.',tags:'Site web,LinkedIn,Appels d\'offres'},
+  {ico:'🎯',name:'Vidéo Publicitaire',desc:'Spots pour Meta, Google et LinkedIn Ads — pensés pour accrocher, convaincre et convertir.',tags:'Meta Ads,Google,YouTube'},
+  {ico:'📱',name:'Social Media',desc:'Reels et Shorts optimisés par plateforme — pour construire votre audience et votre notoriété.',tags:'Instagram,LinkedIn,TikTok'},
+  {ico:'🎤',name:'Témoignage Client',desc:'Vos clients satisfaits deviennent vos meilleurs commerciaux. Le contenu N°1 qui rassure.',tags:'Crédibilité,Conversion,Proof'},
+  {ico:'📸',name:'Photographie Pro',desc:'Portraits, équipe, produits. Une image forte et cohérente sur tous vos supports.',tags:'Portraits,Équipe,Produits'},
+  {ico:'✨',name:'Motion Design',desc:'Explainer videos et animations. Idéal pour le B2B, le conseil et la tech.',tags:'B2B,Explainer,Pitch'},
+];
+let services=JSON.parse(localStorage.getItem('af_services')||JSON.stringify(defaultServices));
+
+function renderServices(){
+  const box=document.getElementById('services-list');
+  box.innerHTML=services.map((s,i)=>`
+    <div style="background:var(--bg);border:1px solid var(--bdr);border-radius:var(--r2);padding:1rem;margin-bottom:.8rem">
+      <div style="display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem">
+        <span style="font-size:1.2rem">${s.ico}</span>
+        <input class="field-input" style="flex:1;font-weight:700" value="${s.name}" onchange="services[${i}].name=this.value">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Description</label>
+        <textarea class="field-textarea" style="min-height:60px" onchange="services[${i}].desc=this.value">${s.desc}</textarea>
+      </div>
+      <div class="field-group" style="margin:0">
+        <label class="field-label">Tags (séparés par des virgules)</label>
+        <input class="field-input" value="${s.tags}" onchange="services[${i}].tags=this.value">
+      </div>
+    </div>
+  `).join('');
+}
+
+function loadContent(){
+  const c=content;
+  if(c['hero-l1'])document.getElementById('hero-l1').value=c['hero-l1'];
+  if(c['hero-l2'])document.getElementById('hero-l2').value=c['hero-l2'];
+  if(c['hero-l3'])document.getElementById('hero-l3').value=c['hero-l3'];
+  if(c['hero-sub'])document.getElementById('hero-sub').value=c['hero-sub'];
+  if(c['hero-btn1'])document.getElementById('hero-btn1').value=c['hero-btn1'];
+  if(c['hero-btn2'])document.getElementById('hero-btn2').value=c['hero-btn2'];
+  if(c['hero-badge'])document.getElementById('hero-badge').value=c['hero-badge'];
+  if(c['cta-title'])document.getElementById('cta-title').value=c['cta-title'];
+  if(c['cta-sub'])document.getElementById('cta-sub').value=c['cta-sub'];
+  if(c['tel1'])document.getElementById('tel1').value=c['tel1'];
+  if(c['tel2'])document.getElementById('tel2').value=c['tel2'];
+  if(c['email'])document.getElementById('email').value=c['email'];
+}
+
+function saveContent(){
+  const ids=['hero-l1','hero-l2','hero-l3','hero-sub','hero-btn1','hero-btn2','hero-badge','stat1n','stat1l','stat2n','stat2l','stat3n','stat3l','cta-title','cta-sub','cta-btn1','cta-btn2','tel1','tel2','email','location','insta','wa','hours'];
+  ids.forEach(id=>{const el=document.getElementById(id);if(el)content[id]=el.value});
+  localStorage.setItem('af_content',JSON.stringify(content));
+  localStorage.setItem('af_services',JSON.stringify(services));
+  showToast('Contenu sauvegardé avec succès !');
+}
+
+function switchSection(s,el){
+  document.querySelectorAll('.editor-nav-item').forEach(e=>e.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.editor-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('section-'+s).classList.add('active');
+}
+
+// ── PORTFOLIO
+function renderPortfolio(){
+  const grid=document.getElementById('porto-grid');
+  const thumbs=['pt1','pt2','pt3','pt4','pt5'];
+  const cards=projects.map((p,i)=>`
+    <div class="porto-card">
+      <div class="porto-thumb ${p.thumb||thumbs[i%5]}">
+        <span style="font-size:2rem;opacity:.4">🎬</span>
+      </div>
+      <div class="porto-body">
+        <div class="porto-tag">${p.sector}</div>
+        <div class="porto-title">${p.title}</div>
+        <div class="porto-metrics">
+          ${p.m1?'<span class="pm">'+p.m1+'</span>':''}
+          ${p.m2?'<span class="pm">'+p.m2+'</span>':''}
+        </div>
+        <div class="porto-actions">
+          <button class="btn btn-outline btn-sm" style="flex:1" onclick="deleteProject(${i})">🗑 Supprimer</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  // Add button card
+  const addCard=`
+    <div class="porto-card pt-add" onclick="openAddProject()">
+      <div class="porto-thumb pt-add" style="height:148px;flex-direction:column;gap:.5rem">
+        <div class="add-icon">＋</div>
+        <div style="font-size:.78rem;color:var(--ink3);font-weight:600">Ajouter</div>
+      </div>
+    </div>
+  `;
+  grid.innerHTML=cards+addCard;
+}
+
+function openAddProject(){
+  document.getElementById('p-title').value='';
+  document.getElementById('p-sector').value='';
+  document.getElementById('p-m1').value='';
+  document.getElementById('p-m2').value='';
+  document.getElementById('p-desc').value='';
+  selectedThumb='pt1';
+  document.getElementById('project-modal').classList.add('open');
+}
+function closeProjectModal(){document.getElementById('project-modal').classList.remove('open')}
+
+function selectThumb(el,cls){
+  selectedThumb=cls;
+  el.parentElement.querySelectorAll('div').forEach(d=>d.style.borderColor='transparent');
+  el.style.borderColor='var(--v)';
+}
+
+function saveProject(){
+  const t=document.getElementById('p-title').value.trim();
+  if(!t){alert('Ajoutez un titre');return;}
+  projects.push({
+    title:t,
+    sector:document.getElementById('p-sector').value||'Production vidéo',
+    m1:document.getElementById('p-m1').value,
+    m2:document.getElementById('p-m2').value,
+    desc:document.getElementById('p-desc').value,
+    thumb:selectedThumb,
+    date:new Date().toLocaleDateString('fr-BE'),
+  });
+  localStorage.setItem('af_projects',JSON.stringify(projects));
+  closeProjectModal();
+  renderPortfolio();
+  updateDashboard();
+  showToast('Réalisation ajoutée au portfolio !');
+}
+function deleteProject(i){
+  if(!confirm('Supprimer cette réalisation ?'))return;
+  projects.splice(i,1);
+  localStorage.setItem('af_projects',JSON.stringify(projects));
+  renderPortfolio();updateDashboard();
+  showToast('Réalisation supprimée');
+}
+
+// ── TOAST
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+</script>
+</body>
+</html>

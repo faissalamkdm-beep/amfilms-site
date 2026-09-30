@@ -322,6 +322,7 @@ footer{background:var(--white);border-top:1px solid var(--bdr);padding:4rem 0 2r
 .reel:hover .rplay{background:rgba(255,255,255,.28);transform:translate(-50%,-50%) scale(1.04)}
 .rplay::before{content:'';position:absolute;left:.55rem;top:.55rem;width:54px;height:54px;border-radius:50%;box-shadow:0 0 0 0 rgba(255,255,255,.55);animation:pr 2.4s infinite}
 @keyframes pr{70%{box-shadow:0 0 0 18px rgba(255,255,255,0)}100%{box-shadow:0 0 0 0 rgba(255,255,255,0)}}
+.hcb2{margin-top:2.2rem;justify-content:center}.hv .hs{margin-bottom:0}
 .hchk{flex-direction:row;justify-content:center;gap:1.6rem;flex-wrap:wrap;margin-top:1.8rem}
 .rmodal{position:fixed;inset:0;z-index:500;background:rgba(15,8,30,.88);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:4vw}
 .rmodal[hidden]{display:none}
@@ -375,10 +376,6 @@ footer{background:var(--white);border-top:1px solid var(--bdr);padding:4rem 0 2r
     <div class="live"><span class="dot"></span><span class="chip cg">Production vidéo · Bruxelles · 7j/7</span></div>
     <h1 class="ht">La vidéo qui fait <em>vraiment grandir</em> votre PME.</h1>
     <p class="hs">Vous avez une expertise solide. On lui donne une image à la hauteur, pour attirer plus de clients et vous démarquer.</p>
-    <div class="hc">
-      <a href="#cta" class="btn bv xl">Je veux plus de clients →</a>
-      <a href="#res" class="btn bg xl">Voir nos réalisations</a>
-    </div>
   </div>
   <div class="w reelw">
     <div class="reel" id="reel" role="button" tabindex="0" aria-label="Lancer le showreel amfilms">
@@ -389,6 +386,10 @@ footer{background:var(--white);border-top:1px solid var(--bdr);padding:4rem 0 2r
       
       
       <div class="rplay" id="rplay"><svg viewBox="0 0 24 24"><polygon points="7,4 20,12 7,20"/></svg><span>Voir avec le son</span></div>
+    </div>
+    <div class="hc hcb2">
+      <a href="#cta" class="btn bv xl">Je veux plus de clients →</a>
+      <a href="#res" class="btn bg xl">Voir nos réalisations</a>
     </div>
     <div class="chk hchk"><span class="ck">Devis gratuit sous 24h</span><span class="ck">Modifications incluses</span><span class="ck">Disponible 7j/7 · 8h–22h</span></div>
   </div>

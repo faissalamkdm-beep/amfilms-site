@@ -340,6 +340,18 @@ footer{background:var(--white);border-top:1px solid var(--bdr);padding:4rem 0 2r
 .reel.has-vid .rplay::before{display:none}
 .reel.has-vid:hover .rplay{transform:scale(1.04)}
 @media(max-width:700px){.reel.has-vid .rplay{right:12px;bottom:12px;padding:.3rem}.reel.has-vid .rplay svg{width:36px;height:36px}}
+
+/* bouton son */
+.reel{cursor:default}.reel.has-vid{cursor:pointer}
+.rplay{font-family:var(--f);cursor:pointer;color:#fff}
+.rplay svg{fill:var(--v)}
+.rplay .ic-on{display:none}
+.reel.snd .rplay .ic-off{display:none}.reel.snd .rplay .ic-on{display:block}
+.reel.has-vid .rplay{left:50%;right:auto;top:22px;bottom:auto;transform:translateX(-50%);background:rgba(15,15,15,.72);border-color:rgba(255,255,255,.18);padding:.35rem 1.1rem .35rem .35rem}
+.reel.has-vid:hover .rplay{transform:translateX(-50%) scale(1.04)}
+.reel.has-vid .rplay svg{width:34px;height:34px;padding:8px}
+.reel.snd .rplay{opacity:.0;transition:opacity .3s}.reel.snd:hover .rplay,.reel.snd .rplay:focus-visible{opacity:1}
+@media(max-width:700px){.reel.has-vid .rplay{top:10px;right:auto;bottom:auto;padding:.3rem .9rem .3rem .3rem;gap:.5rem;font-size:.75rem}.reel.has-vid .rplay span{display:inline}.reel.has-vid .rplay svg{width:28px;height:28px;padding:6px}.reel.snd .rplay{opacity:1}}
 @media(prefers-reduced-motion:reduce){.spin,.spin2,.aura,.grain,.rec i,.rplay::before{animation:none}}
 </style>
 </head>
@@ -378,14 +390,14 @@ footer{background:var(--white);border-top:1px solid var(--bdr);padding:4rem 0 2r
     <p class="hs">Vous avez une expertise solide. On lui donne une image à la hauteur, pour attirer plus de clients et vous démarquer.</p>
   </div>
   <div class="w reelw">
-    <div class="reel" id="reel" role="button" tabindex="0" aria-label="Lancer le showreel amfilms">
+    <div class="reel" id="reel" aria-label="Showreel amfilms">
       <div class="rvim" id="rvim"></div>
       <div class="rph"></div>
       
       
       
       
-      <div class="rplay" id="rplay"><svg viewBox="0 0 24 24"><polygon points="7,4 20,12 7,20"/></svg><span>Voir avec le son</span></div>
+      <button type="button" class="rplay" id="rplay" aria-pressed="false"><svg class="ic-off" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><svg class="ic-on" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Activer le son</span></button>
     </div>
     <div class="hc hcb2">
       <a href="#cta" class="btn bv xl">Je veux plus de clients →</a>
@@ -394,7 +406,6 @@ footer{background:var(--white);border-top:1px solid var(--bdr);padding:4rem 0 2r
     <div class="chk hchk"><span class="ck">Devis gratuit sous 24h</span><span class="ck">Modifications incluses</span><span class="ck">Disponible 7j/7 · 8h–22h</span></div>
   </div>
 </section>
-<div class="rmodal" id="rmodal" hidden><button class="rclose" id="rclose" aria-label="Fermer">×</button><div class="rbox" id="rbox"></div></div>
 
 
 <div class="logos">
@@ -555,28 +566,31 @@ document.querySelectorAll('.fq').forEach(btn=>{
 });
 const lin=document.querySelector('.lin');if(lin)lin.innerHTML+=lin.innerHTML;
 
-/* SHOWREEL : collez ici le lien Vimeo (ex. https://vimeo.com/123456789) */
+/* SHOWREEL : lien Vimeo */
 const REEL_VIMEO='https://vimeo.com/1058998867/f829dddb9b';
 (function(){
-  const reel=document.getElementById('reel'),wrap=document.getElementById('rvim'),
-        md=document.getElementById('rmodal'),box=document.getElementById('rbox');
+  const reel=document.getElementById('reel'),wrap=document.getElementById('rvim'),btn=document.getElementById('rplay');
   if(!reel)return;
   const m=REEL_VIMEO.match(/vimeo\.com\/(?:video\/)?(\d+)(?:\/(\w+))?/);
-  const id=m&&m[1],hash=m&&m[2]?'&h='+m[2]:'';
-  if(id){
-    wrap.innerHTML=`<iframe src="https://player.vimeo.com/video/${id}?background=1&autoplay=1&loop=1&muted=1&autopause=0${hash}" allow="autoplay; fullscreen" title="Showreel amfilms"></iframe>`;
-    wrap.querySelector('iframe').addEventListener('load',()=>reel.classList.add('has-vid'));
+  if(!m){btn.addEventListener('click',()=>location.hash='cta');return;}
+  const id=m[1],hash=m[2]?'&h='+m[2]:'';
+  wrap.innerHTML=`<iframe id="reelFrame" src="https://player.vimeo.com/video/${id}?autoplay=1&loop=1&muted=1&controls=0&title=0&byline=0&portrait=0&autopause=0&playsinline=1&dnt=1${hash}" allow="autoplay; fullscreen; picture-in-picture" title="Showreel amfilms"></iframe>`;
+  let player=null,first=true,on=false;
+  const s=document.createElement('script');s.src='https://player.vimeo.com/api/player.js';
+  s.onload=()=>{player=new Vimeo.Player(document.getElementById('reelFrame'));player.on('play',()=>reel.classList.add('has-vid'));player.ready().then(()=>reel.classList.add('has-vid'));};
+  document.head.appendChild(s);
+  function toggle(){
+    if(!player)return;
+    on=!on;
+    reel.classList.toggle('snd',on);btn.setAttribute('aria-pressed',on);
+    btn.querySelector('span').textContent=on?'Couper le son':'Activer le son';
+    if(on){
+      if(first){first=false;player.setCurrentTime(0).catch(()=>{});}
+      player.setMuted(false).catch(()=>{});player.setVolume(1).catch(()=>{});player.play().catch(()=>{});
+    }else{player.setMuted(true).catch(()=>{});}
   }
-  function open(){
-    if(!id){location.hash='cta';return;}
-    box.innerHTML=`<iframe src="https://player.vimeo.com/video/${id}?autoplay=1${hash}" allow="autoplay; fullscreen" allowfullscreen title="Showreel amfilms"></iframe>`;
-    md.hidden=false;document.body.style.overflow='hidden';
-  }
-  function close(){md.hidden=true;box.innerHTML='';document.body.style.overflow='';}
-  reel.addEventListener('click',open);reel.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
-  document.getElementById('rclose').addEventListener('click',close);
-  md.addEventListener('click',e=>{if(e.target===md)close();});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!md.hidden)close();});
+  btn.addEventListener('click',e=>{e.stopPropagation();toggle();});
+  reel.addEventListener('click',toggle);
 })();
 </script>
 </body>

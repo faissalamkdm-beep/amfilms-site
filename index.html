@@ -470,6 +470,8 @@ footer{background:var(--white);border-top:1px solid var(--bdr);padding:4rem 0 2r
 .pf-modal[hidden]{display:none}
 .pf-box{width:min(1200px,100%);aspect-ratio:16/9;border-radius:18px;overflow:hidden;background:#000}
 .pf-box iframe{width:100%;height:100%;border:0;display:block}
+.pf-box.vert{width:auto;height:min(86vh,1100px);aspect-ratio:9/16;max-width:100%}
+.pf-th img{object-position:center 30%}
 .pf-x{position:absolute;top:18px;right:22px;width:46px;height:46px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:28px;cursor:pointer}
 @media(max-width:900px){.pf-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.pf-tabs{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;margin-inline:0;padding:.3rem 0 1rem;margin-bottom:1rem;scrollbar-width:none}.pf-tabs::-webkit-scrollbar{display:none}.pf-tab{flex:none}.pf-panel{padding:1rem}.pf-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}.pf-b{padding:.6rem .7rem .7rem}.pf-n{font-size:.85rem}.pf-s{font-size:.55rem}.pf-soon{display:none}.pf-pl{width:36px;height:36px}}
@@ -931,15 +933,30 @@ const PF_CATS=[
  {id:'beaute',nom:'Beauté & bien-être',desc:'Instituts, lounges et soins : une image douce et premium.',ic:'<path d="M12 3c3 4 5 6.6 5 9.5a5 5 0 0 1-10 0C7 9.6 9 7 12 3z"/>'}
 ];
 const PF_PROJETS=[
- {cat:'auto',client:'Honda',vimeo:'',img:''},
- {cat:'auto',client:'Omoda & Jaecoo',vimeo:'',img:''},
- {cat:'fitness',client:'Skult Studios',lieu:'Bruxelles',vimeo:'',img:''},
- {cat:'fitness',client:'Aelite Club',lieu:'Waterloo',vimeo:'',img:''},
- {cat:'event',client:'',vimeo:'',img:''},
- {cat:'immo',client:'Goldmann Estates',vimeo:'',img:''},
- {cat:'mastermind',client:'Ultra Mastermind',vimeo:'',img:''},
- {cat:'pub',client:'iFid · Fiduciaire Digitale',vimeo:'',img:''},
- {cat:'beaute',client:'Lindea',lieu:'Beauty lounge',vimeo:'',img:''}
+ {cat:'event',client:'EVA Liège',lieu:'Aftermovie',vimeo:'https://vimeo.com/1021089783',img:'https://i.vimeocdn.com/video/1939782655-486b3c17a1b2f8193c4cd4fad308bcf955674d18a16f0ce2566d54622aeb2f51-d_640',vert:false},
+ {cat:'event',client:'EVA Liège',lieu:'Tournoi 3.0',vimeo:'https://vimeo.com/1232098931',img:'https://i.vimeocdn.com/video/2207425868-eb9c589c41c02d575a4d9b8682c3aba41ff1beb2ff996d002cc4fb5716ee1512-d_640',vert:false},
+ {cat:'event',client:'Stefanini',lieu:'Aftermovie',vimeo:'https://vimeo.com/1232110177',img:'https://i.vimeocdn.com/video/2207440735-55d1c555a2432059ee66508ab8bb382fa094c18e6ae99213a65d4831babc84c4-d_640',vert:false},
+ {cat:'event',client:'Assistool',lieu:'Mons',vimeo:'https://vimeo.com/1232101006',img:'https://i.vimeocdn.com/video/2207428709-1864cfcfcf04dccb11c369519884bfbca9c494785b8aa206d9008d4956f207f6-d_640',vert:false},
+ {cat:'event',client:'Xurrent',lieu:'Événement',vimeo:'https://vimeo.com/1232108680',img:'https://i.vimeocdn.com/video/2207438769-c8ee7425caa7800944da3a2d5040a5ca311276378a259c45421f14b426178a76-d_640',vert:true},
+ {cat:'event',client:'YC Five',lieu:'Événement',vimeo:'https://vimeo.com/1232109814',img:'https://i.vimeocdn.com/video/2207440191-de50a83a9a8659fcd5db3e65ac82bf42b726db165512ef5474870b576ef32feb-d_640',vert:true},
+ {cat:'fitness',client:'Aelite Club',lieu:'Waterloo',vimeo:'https://vimeo.com/1232100710',img:'https://i.vimeocdn.com/video/2207428163-bc357a49ce5337816645d4c650fc971f4060e28c142b757fe2b8fd8ce54241c4-d_640',vert:true},
+ {cat:'fitness',client:'Aelite Club',lieu:'Yoga',vimeo:'https://vimeo.com/1232100919',img:'https://i.vimeocdn.com/video/2207428460-de1f82ea59a49a2d1b5605791116471df11e779704a54122365a4226dae686b1-d_640',vert:true},
+ {cat:'fitness',client:'Skult Studios',lieu:'Châtelain',vimeo:'https://vimeo.com/1232109285',img:'https://i.vimeocdn.com/video/2207439520-f4d9c6ab3966cc3a684b9e7ff052b60536b635bcc5148e5f724e517607a5eb05-d_640',vert:true},
+ {cat:'fitness',client:'Skult Studios',lieu:'Annonce Châtelain',vimeo:'https://vimeo.com/1232109682',img:'https://i.vimeocdn.com/video/2207439974-0d4fda5bb3e08515aa35d0b419f30ba4c82584e6821a51311614a50f98c660ed-d_640',vert:true},
+ {cat:'fitness',client:'Skult Studios',lieu:'Présentation Rhode',vimeo:'https://vimeo.com/1232105565',img:'https://i.vimeocdn.com/video/2207434741-23ec323394a85d711b20418c041823c4bbb8565bc210dfb6206bae6c09ddb1f0-d_640',vert:true},
+ {cat:'fitness',client:'The New Me',lieu:'Aftermovie · Bruxelles',vimeo:'https://vimeo.com/1232107638',img:'https://i.vimeocdn.com/video/2207437717-c7d87c8188b402f43c26ee01d790567b637faa029d943152788d5f23dc607bb2-d_640',vert:true},
+ {cat:'fitness',client:'Ryad Merhy',lieu:'',vimeo:'https://vimeo.com/1232100920',img:'https://i.vimeocdn.com/video/2207428477-19fa94dec24acb84f21d2fadc802045702ee4aa2045c2a27250af8c88b3c6bd7-d_640',vert:true},
+ {cat:'fitness',client:'YC Five Padel Club',lieu:'Présentation',vimeo:'https://vimeo.com/1232109914',img:'https://i.vimeocdn.com/video/2207440425-2a0312464c4ad545447a7ad97296da84a3ee82641fccbe7ba8825827b10397c2-d_640',vert:true},
+ {cat:'auto',client:'Honda',lieu:'× Kim Gevaert',vimeo:'https://vimeo.com/1232108064',img:'https://i.vimeocdn.com/video/2207438048-3105bf1eacf636d934fe51ba606d020fc8cfcf31900ed6747f286bb45d4ebba2-d_640',vert:true},
+ {cat:'auto',client:'Omoda & Jaecoo',lieu:'Aftermovie événement',vimeo:'https://vimeo.com/1232107949',img:'https://i.vimeocdn.com/video/2207437975-68ee53d19484b55cfcf7fec958b6d6b34e0b5882dada4442af72e37ce3e3ff8e-d_640',vert:false},
+ {cat:'immo',client:'Goldmann Estates',lieu:'Présentation chantier',vimeo:'https://vimeo.com/1232107152',img:'https://i.vimeocdn.com/video/2207437300-6535206583ed395a8a65fffa3442cf30e96a565df2cc85207e5be528509f84b4-d_640',vert:true},
+ {cat:'mastermind',client:'Ultra Mastermind',lieu:'Athènes',vimeo:'https://vimeo.com/1026876703',img:'https://i.vimeocdn.com/video/1946742082-acdfecfbd3689fa1d849c8920e5a4fbc13e31a07afac00115ae83dd2bcfe776f-d_640',vert:true},
+ {cat:'mastermind',client:'Mastermind Samuel Onuha',lieu:'Amsterdam',vimeo:'https://vimeo.com/1232110911',img:'https://i.vimeocdn.com/video/2207442002-cc28b81e7122f957c41037707d841fe4c889e261566fb131738edb275e2207dd-d_640',vert:false},
+ {cat:'pub',client:'iFid · Fiduciaire Digitale',lieu:'',vimeo:'',img:'',vert:false},
+ {cat:'beaute',client:'Lindea',lieu:'Beauty lounge',vimeo:'https://vimeo.com/1232105225',img:'https://i.vimeocdn.com/video/2207434576-096660b3ce0cc8e5d39072b7979aa20c062613c5773002c26e38e80ed6bf804b-d_640',vert:true},
+ {cat:'beaute',client:'L\'Excellence Zen',lieu:'Présentation',vimeo:'https://vimeo.com/1232104690',img:'https://i.vimeocdn.com/video/2207433463-5c8eaa4a673daf8ab74a41934285ed48c4d1ec330812d1605ca7a77b4f7cf96f-d_640',vert:true},
+ {cat:'beaute',client:'L\'Excellence Zen',lieu:'Massage',vimeo:'https://vimeo.com/1232104893',img:'https://i.vimeocdn.com/video/2207433682-5768afb3e0bdd9ed9bf65b060232d657633a3b91000ddf30226ed17864c4cdba-d_640',vert:true},
+ {cat:'beaute',client:'L\'Excellence Zen',lieu:'Massage 2',vimeo:'https://vimeo.com/1232104617',img:'https://i.vimeocdn.com/video/2207433347-4b25b35b31cf4e1fb57955a616b2d0a46ccf4ec54a7e6f447ef98aae2949bd0a-d_640',vert:true}
 ];
 (function(){
   const tabs=document.getElementById('pfTabs');if(!tabs)return;
@@ -962,11 +979,11 @@ const PF_PROJETS=[
       const allSecs=PF_CATS.filter(k=>k.id!=='all'), feat=['event','fitness','auto'];
       const shown=pfAll?allSecs:allSecs.filter(k=>feat.includes(k.id)).sort((a,b)=>feat.indexOf(a.id)-feat.indexOf(b.id));
       grid.innerHTML=shown.map((k,i)=>{
-        const ps=PF_PROJETS.filter(p=>p.cat===k.id&&p.client), n=ps.length;
+        const ps=PF_PROJETS.filter(p=>p.cat===k.id&&p.client), n=ps.length; const cover=k.img||((ps.find(p=>p.img&&!p.vert)||ps.find(p=>p.img)||{}).img||'');
         return `<button type="button" class="pf-sec" data-go="${k.id}" style="animation-delay:${i*50}ms">
-          ${k.img?`<img src="${esc(k.img)}" alt="" loading="lazy">`:''}
+          ${cover?`<img src="${esc(cover)}" alt="" loading="lazy">`:''}
           <span class="pf-sec-ic">${svg(k.ic)}</span>
-          <span class="pf-sec-b"><span class="pf-sec-n">${k.nom}</span><span class="pf-sec-c">${n?ps.map(p=>esc(p.client.split(' · ')[0])).join(' · '):'Nouveaux projets à venir'}</span></span>
+          <span class="pf-sec-b"><span class="pf-sec-n">${k.nom}</span><span class="pf-sec-c">${n?[...new Set(ps.map(p=>p.client.split(' · ')[0]))].slice(0,3).map(esc).join(' · '):'Nouveaux projets à venir'}</span></span>
           <span class="pf-sec-f"><span>Voir les projets</span><span class="pf-sec-a">→</span></span></button>`;
       }).join('')+`<a href="#rdv" class="pf-sec pf-sec-cta"><span class="pf-sec-ic">${svg('<path d="M4 5h16v11H9.5L4 20z"/><path d="M8.5 10.5h7"/>')}</span><span class="pf-sec-b"><span class="pf-sec-n">Votre secteur ?</span><span class="pf-sec-c">On s'adapte à chaque métier. Parlons de votre projet.</span></span><span class="pf-sec-f"><span>Réserver un appel</span><span class="pf-sec-a">→</span></span></a>`+`<button type="button" class="pf-more" data-more="1">${pfAll?'Voir moins de secteurs ↑':'Voir tous les secteurs ('+allSecs.length+') ↓'}</button>`;
       return;
@@ -975,7 +992,7 @@ const PF_PROJETS=[
     let list=PF_PROJETS.filter(p=>p.cat===id);
     grid.innerHTML=`<button type="button" class="pf-back" data-go="all">← Tous les secteurs</button>`+list.map((p,i)=>{
       const todo=!p.client, v=vid(p.vimeo), cn=catOf(p.cat).nom;
-      return `<button type="button" class="pf-card${todo?' todo':''}" style="animation-delay:${i*60}ms" ${v?`data-v="${v.id}" data-h="${v.h||''}"`:''} ${todo?'tabindex="-1"':''}>
+      return `<button type="button" class="pf-card${todo?' todo':''}" style="animation-delay:${i*60}ms" ${v?`data-v="${v.id}" data-h="${v.h||''}" data-vert="${p.vert?1:0}"`:''} ${todo?'tabindex="-1"':''}>
         <div class="pf-th">${p.img?`<img src="${esc(p.img)}" alt="" loading="lazy">`:''}<span class="pf-pl"><svg viewBox="0 0 24 24"><polygon points="6,4 20,12 6,20"/></svg></span>${!todo&&!v?'<span class="pf-soon">Vidéo bientôt</span>':''}</div>
         <div class="pf-b"><div class="pf-s">${esc(cn)}${p.lieu?' · '+esc(p.lieu):''}</div><div class="pf-n">${todo?'Projet à ajouter':esc(p.client)}</div></div></button>`;
     }).join('');
@@ -984,7 +1001,7 @@ const PF_PROJETS=[
   grid.addEventListener('click',e=>{if(e.target.closest('[data-more]')){pfAll=!pfAll;show('all');return;}const g=e.target.closest('[data-go]');if(!g)return;show(g.dataset.go);const top=document.getElementById('pfPanel').getBoundingClientRect().top+scrollY-110;if(Math.abs(scrollY-top)>200)scrollTo({top,behavior:'smooth'})});
   tabs.addEventListener('keydown',e=>{if(!['ArrowRight','ArrowLeft'].includes(e.key))return;const b=[...tabs.querySelectorAll('button')],i=b.indexOf(document.activeElement);if(i<0)return;const n=b[(i+(e.key==='ArrowRight'?1:b.length-1))%b.length];n.focus();show(n.dataset.id)});
   grid.addEventListener('click',e=>{const c=e.target.closest('.pf-card[data-v]');if(!c)return;
-    box.innerHTML=`<iframe src="https://player.vimeo.com/video/${c.dataset.v}?autoplay=1${c.dataset.h?'&h='+c.dataset.h:''}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;md.hidden=false;document.body.style.overflow='hidden'});
+    box.classList.toggle('vert',c.dataset.vert==='1');box.innerHTML=`<iframe src="https://player.vimeo.com/video/${c.dataset.v}?autoplay=1${c.dataset.h?'&h='+c.dataset.h:''}" allow="autoplay; fullscreen" allowfullscreen></iframe>`;md.hidden=false;document.body.style.overflow='hidden'});
   const close=()=>{md.hidden=true;box.innerHTML='';document.body.style.overflow=''};
   document.getElementById('pfX').addEventListener('click',close);
   md.addEventListener('click',e=>{if(e.target===md)close()});
